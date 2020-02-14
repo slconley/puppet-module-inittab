@@ -15,32 +15,18 @@ class inittab (
 ) {
 
   if $ensure_ttys1 {
-    validate_re($ensure_ttys1,'^(present)|(absent)$',"inittab::ensure_ttys1 is ${ensure_ttys1} and if defined must be \'present\' or \'absent\'.")
+    validate_legacy(Pattern, validate_re, $ensure_ttys1,
+      '^(present)|(absent)$',"inittab::ensure_ttys1 is ${ensure_ttys1} and if defined must be \'present\' or \'absent\'.")
   }
 
-  validate_re($file_mode, '^[0-7]{4}$',
+  validate_legacy(Pattern, validate_re, $file_mode, '^[0-7]{4}$',
     "inittab::file_mode is <${file_mode}> and must be a valid four digit mode in octal notation.")
-
-  if is_string($require_single_user_mode_password) {
-    $require_single_user_mode_password_bool = str2bool($require_single_user_mode_password)
-  } else {
-    $require_single_user_mode_password_bool = $require_single_user_mode_password
-  }
-  validate_bool($require_single_user_mode_password_bool)
-
-  if is_string($enable_ctrlaltdel) {
-    $enable_ctrlaltdel_bool = str2bool($enable_ctrlaltdel)
-  } else {
-    $enable_ctrlaltdel_bool = $enable_ctrlaltdel
-  }
-  validate_bool($enable_ctrlaltdel_bool)
-
-  validate_string($ctrlaltdel_override_owner)
-
-  validate_string($ctrlaltdel_override_group)
-
-  validate_re($ctrlaltdel_override_mode, '^[0-7]{4}$',
+  validate_legacy(Pattern, validate_re, $ctrlaltdel_override_mode, '^[0-7]{4}$',
     "inittab::ctrlaltdel_override_mode is <${ctrlaltdel_override_mode}> and must be a valid four digit mode in octal notation.")
+  validate_legacy(Boolean, validate_bool, $require_single_user_mode_password)
+  validate_legacy(Boolean, validate_bool, $enable_ctrlaltdel)
+  validate_legacy(String, validate_string, $ctrlaltdel_override_owner)
+  validate_legacy(String, validate_string, $ctrlaltdel_override_group)
 
   case $::osfamily {
     'RedHat': {
@@ -171,10 +157,10 @@ class inittab (
   }
 
   # validate default_runlevel_real
-  validate_re($default_runlevel_real_string, '^[0-6sS]$',
+  validate_legacy(Pattern, validate_re, $default_runlevel_real_string, '^[0-6sS]$',
     "default_runlevel <${default_runlevel_real}> does not match regex")
 
-  if $enable_ctrlaltdel_bool == true {
+  if $enable_ctrlaltdel == true {
     $ctrlaltdel_override_ensure = 'absent'
     $ctrlaltdel_target = '/lib/systemd/system/ctrl-alt-del.target'
   } else {
@@ -226,7 +212,7 @@ class inittab (
     }
   }
 
-  validate_bool($support_ctrlaltdel_override)
+  validate_legacy(Boolean, validate_bool, $support_ctrlaltdel_override)
 
   if $support_ctrlaltdel_override == true {
 
